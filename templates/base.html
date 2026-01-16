@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}VerificaZap{% endblock %}</title>
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+</head>
+<body>
+    <button id="theme-toggle" class="theme-toggle" aria-label="Alternar tema">🌙</button>
+    <div id="loading-overlay">
+        <div class="spinner"></div>
+        <p>Analisando, por favor aguarde...</p>
+    </div>
+    <div class="container">
+        <nav class="main-nav">
+            <a href="{{ url_for('index') }}" class="nav-link {{ 'active' if active_page == 'home' else '' }}">🏠 Home</a>
+            <a href="{{ url_for('dns_page') }}" class="nav-link {{ 'active' if active_page == 'dns' else '' }}">🌐 DNS</a>
+            <a href="{{ url_for('whois_page') }}" class="nav-link {{ 'active' if active_page == 'whois' else '' }}">👤 WHOIS</a>
+            <a href="{{ url_for('ping_page') }}" class="nav-link {{ 'active' if active_page == 'ping' else '' }}">📶 Ping</a>
+            <a href="{{ url_for('tracert_page') }}" class="nav-link {{ 'active' if active_page == 'tracert' else '' }}">🛣️ Tracert</a>
+            <a href="{{ url_for('connection_page') }}" class="nav-link {{ 'active' if active_page == 'connection' else '' }}">🚀 Conexão</a>
+        </nav>
+        
+        <header>
+            {% block header %}{% endblock %}
+        </header>
+
+        <main>
+            {% block content %}{% endblock %}
+        </main>
+        <footer>
+            <p>Um projeto de segurança para análise de Sites suspeitos. &copy; {{ current_year }} by Lúcio Macedo</p>
+        </footer>
+    </div>
+    <script>
+        // Garante que o DOM esteja carregado antes de executar
+        document.addEventListener('DOMContentLoaded', function() {
+            const forms = document.querySelectorAll('form');
+            forms.forEach(form => {
+                form.addEventListener('submit', function(e) {
+                    const input = form.querySelector('input[name="url"]');
+                    // Se o input existe e está vazio após remover espaços
+                    if (input && !input.value.trim()) {
+                        e.preventDefault(); // Impede o envio
+                        alert('Por favor, digite algo antes de enviar.');
+                        input.value = ''; // Limpa o campo
+                        input.focus();    // Coloca o cursor de volta no campo
+                    } else {
+                        // Exibe o overlay de carregamento se a validação passar
+                        document.getElementById('loading-overlay').style.display = 'flex';
+                    }
+                });
+            });
+
+            // Funcionalidade de Copiar para Área de Transferência
+            document.querySelectorAll('.btn-copy').forEach(button => {
+                button.addEventListener('click', function() {
+                    const targetId = this.getAttribute('data-target');
+                    const targetElement = document.getElementById(targetId);
+                    
+                    if (targetElement) {
+                        navigator.clipboard.writeText(targetElement.innerText).then(() => {
+                            const originalText = this.innerText;
+                            this.innerText = 'Copiado! ✅';
+                            setTimeout(() => {
+                                this.innerText = originalText;
+                            }, 2000);
+                        }).catch(err => {
+                            console.error('Erro ao copiar:', err);
+                            alert('Não foi possível copiar o texto.');
+                        });
+                    }
+                });
+            });
+
+            // Funcionalidade de Exportar PDF
+            const btnExport = document.getElementById('btn-export-pdf');
+            if (btnExport) {
+                btnExport.addEventListener('click', function() {
+                    const element = document.getElementById('pdf-content');
+                    const opt = {
+                        margin:       [10, 10, 10, 10], // Margens: topo, esquerda, baixo, direita
+                        filename:     'relatorio-verificazap.pdf',
+                        image:        { type: 'jpeg', quality: 0.98 },
+                        html2canvas:  { scale: 2, useCORS: true }, // Scale 2 melhora a qualidade
+                        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                    };
+                    
+                    const originalText = this.innerText;
+                    this.innerText = 'Gerando PDF... ⏳';
+                    
+                    html2pdf().set(opt).from(element).save().then(() => {
+                        this.innerText = originalText;
+                    }).catch(err => {
+                        console.error("Erro ao gerar o PDF:", err);
+                        alert("Ocorreu um erro ao gerar o PDF. Por favor, tente novamente.");
+                        // Restaura o texto original do botão em caso de falha
+                        this.innerText = originalText;
+                    });
+                });
+            }
+
+            // Funcionalidade Dark Mode
+            const toggleBtn = document.getElementById('theme-toggle');
+            const currentTheme = localStorage.getItem('theme');
+            const prefersDarkScheme = window.matchMedia("(prefers-color-scheme: dark)");
+
+            if (currentTheme == "dark" || (!currentTheme && prefersDarkScheme.matches)) {
+                document.documentElement.setAttribute("data-theme", "dark");
+                toggleBtn.innerText = "☀️";
+            }
+
+            toggleBtn.addEventListener("click", function() {
+                let theme = "light";
+                if (document.documentElement.getAttribute("data-theme") !== "dark") {
+                    document.documentElement.setAttribute("data-theme", "dark");
+                    theme = "dark";
+                    this.innerText = "☀️";
+                } else {
+                    document.documentElement.setAttribute("data-theme", "light");
+                    this.innerText = "🌙";
+                }
+                localStorage.setItem("theme", theme);
+            });
+        });
+    </script>
+</body>
+</html>

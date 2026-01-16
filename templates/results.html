@@ -1,0 +1,200 @@
+{% extends "base.html" %}
+
+{% block title %}Resultados da Análise - VerificaSite{% endblock %}
+
+{% block header %}
+    <h1>Resultados da Análise 📊</h1>
+    <p class="url-analisada"><strong>URL Analisada:</strong> {{ url }}</p>
+{% endblock %}
+
+{% block content %}
+    <button id="btn-export-pdf" class="btn-pdf">📄 Baixar Relatório em PDF</button>
+
+    <div id="pdf-content">
+    <!-- Seção VirusTotal -->
+    {% if vt_result %}
+            <div class="card report-vt">
+                <h2>Relatório VirusTotal</h2>
+                {% if vt_result.erro %}
+                    <p class="error">❌ {{ vt_result.erro }}</p>
+                {% elif vt_result.status %}
+                     <p>⚪ {{ vt_result.status }}</p>
+                {% else %}
+                    <p><strong>Malicioso:</strong> <span class="malicious">{{ vt_result.malicioso }}</span></p>
+                    <p><strong>Suspeito:</strong> <span class="suspicious">{{ vt_result.suspeito }}</span></p>
+                    <p><strong>Seguro:</strong> <span class="safe">{{ vt_result.seguro }}</span></p>
+                    <div class="summary">
+                        {% if vt_result.malicioso > 0 or vt_result.suspeito > 0 %}
+                            <strong>Resultado:</strong> <span class="malicious">PERIGOSO</span>
+                        {% else %}
+                            <strong>Resultado:</strong> <span class="safe">SEGURO</span>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            </div>
+            {% endif %}
+
+            <!-- Seção Google Safe Browsing -->
+            {% if gsb_result %}
+            <div class="card report-gsb">
+                <h2>Relatório Google Safe Browsing</h2>
+                {% if gsb_result.erro %}
+                    <p class="error">❌ {{ gsb_result.erro }}</p>
+                {% else %}
+                    {% if gsb_result.status == 'Perigoso' %}
+                        <p><strong>Ameaça:</strong> <span class="malicious">{{ gsb_result.ameaça }}</span></p>
+                        <div class="summary">
+                            <strong>Resultado:</strong> <span class="malicious">PERIGOSO</span>
+                        </div>
+                    {% else %}
+                        <p><span class="safe">Nenhuma ameaça encontrada.</span></p>
+                         <div class="summary">
+                            <strong>Resultado:</strong> <span class="safe">SEGURO</span>
+                        </div>
+                    {% endif %}
+                {% endif %}
+            </div>
+            {% endif %}
+
+            <!-- Seção WHOIS -->
+            {% if whois_result %}
+            <div class="card report-whois">
+                <h2>Relatório WHOIS 🔍</h2>
+                {% if whois_result.erro %}
+                    <p class="error">❌ {{ whois_result.erro }}</p>
+                {% else %}
+                    <ul>
+                        {% for chave, valor in whois_result.items() %}
+                            {# Exibe todos os campos que têm valor, exceto o texto bruto que vai separado #}
+                            {% if valor and chave != 'raw_text' %}
+                                <li><strong>{{ chave|replace('_', ' ')|title }}:</strong> {{ formatar_valor(valor) }}</li>
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
+                    {% if whois_result.raw_text %}
+                        <details>
+                            <summary>📜 Ver Dados Brutos (Raw Text)</summary>
+                            <pre>{{ whois_result.raw_text }}</pre>
+                        </details>
+                    {% endif %}
+                {% endif %}
+            </div>
+            {% endif %}
+
+            <!-- Seção DNS -->
+            {% if dns_result %}
+            <div class="card report-dns">
+                <h2>Relatório DNS 🌐</h2>
+                {% if dns_result.erro %}
+                    <p class="error">❌ {{ dns_result.erro }}</p>
+                {% elif dns_result %}
+                    <div class="dns-records">
+                        {% for tipo, registros in dns_result.items() %}
+                            <div class="dns-group">
+                                <h3>Registro {{ tipo }}</h3>
+                                <ul>
+                                    {% for reg in registros %}
+                                        <li>{{ reg }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p>Nenhum registro DNS encontrado.</p>
+                {% endif %}
+            </div>
+            {% endif %}
+
+            <!-- Seção Ping -->
+            {% if ping_result %}
+            <div class="card report-ping">
+                <h2>Relatório de Latência (Ping) 📶</h2>
+                {% if ping_result.erro %}
+                    <p class="error">❌ {{ ping_result.erro }}</p>
+                {% else %}
+                    <pre>{{ ping_result.output }}</pre>
+                {% endif %}
+            </div>
+            {% endif %}
+
+            <!-- Seção Tracert -->
+            {% if tracert_result %}
+            <div class="card report-tracert">
+                <h2>Relatório de Rota (Tracert) 🛣️</h2>
+                {% if tracert_result.erro %}
+                    <p class="error">❌ {{ tracert_result.erro }}</p>
+                {% else %}
+                    <pre>{{ tracert_result.output }}</pre>
+                {% endif %}
+            </div>
+            {% endif %}
+
+            <!-- Seção Teste de Conexão -->
+            {% if conn_result %}
+            <div class="card report-connection">
+                <h2>Relatório de Conexão 🚀</h2>
+                
+                <div class="conn-grid">
+                    <div class="conn-item">
+                        <h3>Latência (Ping)</h3>
+                        {% if conn_result.latency_error %}
+                            <span class="error">{{ conn_result.latency_error }}</span>
+                        {% else %}
+                            <span class="value">{{ "%.2f"|format(conn_result.avg_latency) }} ms</span>
+                            <small>Jitter: {{ "%.2f"|format(conn_result.jitter) }} ms</small>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="conn-item">
+                        <h3>Velocidade</h3>
+                        {% if conn_result.speedtest_error %}
+                            <span class="error">{{ conn_result.speedtest_error }}</span>
+                        {% else %}
+                            <p>⬇️ Download: <strong>{{ "%.2f"|format(conn_result.download) }} Mbps</strong></p>
+                            <p>⬆️ Upload: <strong>{{ "%.2f"|format(conn_result.upload) }} Mbps</strong></p>
+                            <div style="position: relative; height:200px; width:100%">
+                                <canvas id="speedChart"></canvas>
+                            </div>
+                            <script>
+                            /*    document.addEventListener('DOMContentLoaded', function() {
+                                    const ctx = document.getElementById('speedChart').getContext('2d');
+                                    new Chart(ctx, {
+                                        type: 'bar',
+                                        data: {
+                                            labels: ['Download', 'Upload'],
+                                            datasets: [{
+                                                label: 'Velocidade (Mbps)',
+                                                data: [{{ conn_result.download }}, {{ conn_result.upload }}],
+                                                backgroundColor: [
+                                                    'rgba(54, 162, 235, 0.6)',
+                                                    'rgba(75, 192, 192, 0.6)'
+                                                ],
+                                                borderColor: [
+                                                    'rgba(54, 162, 235, 1)',
+                                                    'rgba(75, 192, 192, 1)'
+                                                ],
+                                                borderWidth: 1
+                                            }]
+                                        },
+                                        options: {
+                                            responsive: true,
+                                            maintainAspectRatio: false,
+                                            scales: {
+                                                y: {
+                                                    beginAtZero: true
+                                                }
+                                            }
+                                        }
+                                    });
+                                });*/
+                            </script>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+    </div>
+
+            <a href="{{ url_for('index') }}" class="back-link">Verificar outra URL</a>
+{% endblock %}

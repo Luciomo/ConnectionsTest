@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}Teste de Conexão - VerificaZap{% endblock %}
+
+{% block header %}
+    <h1>Teste de Conexão 🚀</h1>
+    <p>Meça Latência, Jitter e Velocidade de Internet.</p>
+{% endblock %}
+
+{% block content %}
+    <form action="{{ url_for('check_connection') }}" method="POST">
+        <input type="text" name="url" placeholder="exemplo.com ou IP (para teste de latência)" required pattern=".*\S+.*">
+        <button type="submit">Iniciar Teste</button>
+    </form>
+    <p style="font-size: 0.9em; color: #666; margin-top: 10px;">⚠️ O teste de velocidade pode levar até 30 segundos.</p>
+    <a href="{{ url_for('index') }}" class="back-link">← Voltar para Home</a>
+{% endblock %}

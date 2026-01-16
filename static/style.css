@@ -1,0 +1,379 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
+:root {
+    --primary-color: #007bff;
+    --background-color: #f4f7f6;
+    --card-background: #ffffff;
+    --text-color: #333;
+    --heading-color: #111;
+    --safe-color: #28a745;
+    --malicious-color: #dc3545;
+    --suspicious-color: #ffc107;
+    --border-radius: 8px;
+    --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    --input-bg: #ffffff;
+    --input-border: #ccc;
+    --secondary-text: #666;
+    --border-color: #eee;
+    --pre-bg: #f8f9fa;
+}
+
+/* Variáveis para o Modo Escuro */
+[data-theme="dark"] {
+    --primary-color: #4da3ff;
+    --background-color: #121212;
+    --card-background: #1e1e1e;
+    --text-color: #e0e0e0;
+    --heading-color: #ffffff;
+    --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    --input-bg: #2d2d2d;
+    --input-border: #444;
+    --secondary-text: #aaa;
+    --border-color: #333;
+    --pre-bg: #2d2d2d;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.container {
+    width: 100%;
+    max-width: 600px;
+    text-align: center;
+}
+
+header {
+    margin-bottom: 2rem;
+}
+
+header h1 {
+    color: var(--heading-color);
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+header p {
+    font-size: 1.1rem;
+    color: var(--secondary-text);
+}
+
+form {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 2rem;
+}
+
+form input[type="text"],
+form input[type="url"] {
+    flex-grow: 1;
+    padding: 12px 15px;
+    border: 1px solid var(--input-border);
+    background-color: var(--input-bg);
+    color: var(--text-color);
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+    transition: border-color 0.2s, box-shadow 0.2s, background-color 0.3s ease, color 0.3s ease;
+}
+
+form input[type="text"]:focus,
+form input[type="url"]:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2);
+}
+
+form button {
+    padding: 12px 20px;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+form button:hover {
+    background-color: #0056b3;
+}
+
+.card {
+    background-color: var(--card-background);
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    text-align: left;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card h2 {
+    margin-top: 0;
+    color: var(--heading-color);
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.card p {
+    font-size: 1rem;
+    line-height: 1.6;
+}
+
+.safe { color: var(--safe-color); font-weight: 600; }
+.malicious { color: var(--malicious-color); font-weight: 600; }
+.suspicious { color: var(--suspicious-color); font-weight: 600; }
+.error { color: var(--malicious-color); }
+
+.summary {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-color);
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+.url-analisada {
+    font-size: 1rem;
+    word-wrap: break-word;
+    background-color: var(--pre-bg);
+    padding: 10px;
+    border-radius: var(--border-radius);
+    margin-bottom: 1.5rem;
+}
+
+.back-link {
+    display: inline-block;
+    margin-top: 1rem;
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.back-link:hover {
+    text-decoration: underline;
+}
+
+footer {
+    margin-top: 3rem;
+    color: #888;
+    font-size: 0.9rem;
+}
+
+/* --- Responsividade para Dispositivos Móveis --- */
+@media (max-width: 600px) {
+    body {
+        padding: 15px;
+    }
+
+    header h1 {
+        font-size: 2rem;
+    }
+
+    form {
+        flex-direction: column;
+    }
+
+    form button {
+        width: 100%;
+    }
+}
+
+/* Estilos da Navegação */
+.nav-link {
+    margin: 0 10px;
+    text-decoration: none;
+    color: var(--primary-color);
+    font-weight: normal;
+    transition: color 0.2s ease, text-decoration 0.2s ease;
+}
+
+.nav-link:hover {
+    color: #0056b3;
+    text-decoration: underline;
+}
+
+.nav-link.active {
+    color: var(--text-color);
+    font-weight: bold;
+}
+
+/* Spinner de Carregamento */
+#loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.9);
+    z-index: 9999;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    display: none;
+}
+
+.main-nav {
+    margin-bottom: 20px;
+    text-align: center;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 10px;
+}
+
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid #f3f3f3;
+    border-top: 5px solid var(--primary-color);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 15px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Botão de Copiar */
+.btn-copy {
+    background-color: #6c757d;
+    color: white;
+    padding: 5px 10px;
+    font-size: 0.8rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-left: 10px;
+    transition: background-color 0.2s;
+}
+
+.btn-copy:hover {
+    background-color: #5a6268;
+}
+
+/* Botão PDF */
+.btn-pdf {
+    background-color: #dc3545;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: var(--border-radius);
+    font-weight: 600;
+    cursor: pointer;
+    margin-bottom: 20px;
+    display: inline-block;
+    transition: background-color 0.2s;
+}
+
+.btn-pdf:hover {
+    background-color: #c82333;
+}
+
+/* Estilos dos Relatórios (Refatoração) */
+.report-whois ul {
+    list-style: none;
+    padding: 0;
+}
+
+.report-whois li {
+    margin-bottom: 8px;
+}
+
+.report-whois details {
+    margin-top: 15px;
+    border-top: 1px solid var(--border-color);
+    padding-top: 10px;
+}
+
+.report-whois summary {
+    cursor: pointer;
+    color: var(--secondary-text);
+    font-weight: bold;
+}
+
+.report-whois pre, .report-ping pre, .report-tracert pre {
+    background: var(--pre-bg);
+    padding: 10px;
+    border-radius: 5px;
+    overflow-x: auto;
+    font-size: 0.85em;
+    margin-top: 10px;
+    white-space: pre-wrap;
+}
+
+.dns-group {
+    margin-bottom: 15px;
+}
+
+.dns-group h3 {
+    font-size: 1.1em;
+    color: var(--heading-color);
+    margin-bottom: 5px;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 3px;
+}
+
+.dns-group ul {
+    list-style: none;
+    padding-left: 10px;
+    margin: 0;
+}
+
+.dns-group li {
+    font-family: monospace;
+    color: var(--secondary-text);
+    word-break: break-all;
+    padding: 2px 0;
+}
+
+/* Botão de Tema */
+.theme-toggle {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: none;
+    border: none;
+    font-size: 1.8rem;
+    cursor: pointer;
+    z-index: 1000;
+}
+
+/* Transições suaves para elementos de texto e bordas */
+header h1, header p, .card h2, .summary, .url-analisada, .main-nav, .report-whois details, .report-whois summary, .report-whois pre, .report-ping pre, .report-tracert pre, .dns-group h3, .dns-group li {
+    transition: color 0.3s ease, background-color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Estilos do Relatório de Conexão */
+.conn-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.conn-item {
+    background: var(--pre-bg);
+    padding: 15px;
+    border-radius: var(--border-radius);
+    text-align: center;
+}
+
+.conn-item h3 {
+    margin-top: 0;
+    font-size: 1.1rem;
+    color: var(--secondary-text);
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 5px;
+}

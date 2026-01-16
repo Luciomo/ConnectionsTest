@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}Consulta DNS - VerificaZap{% endblock %}
+
+{% block header %}
+    <h1>Consulta DNS 🌐</h1>
+    <p>Verifique os registros A, MX, NS e TXT de um domínio ou IP.</p>
+{% endblock %}
+
+{% block content %}
+    <form action="{{ url_for('check_dns') }}" method="POST">
+        <input type="text" name="url" placeholder="exemplo.com" required>
+        <button type="submit">Consultar Registros</button>
+    </form>
+    <a href="{{ url_for('index') }}" class="back-link">Voltar para Home</a>
+{% endblock %}

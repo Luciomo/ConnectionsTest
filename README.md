@@ -106,7 +106,7 @@ Para rodar esta aplicação em uma instância EC2:
 ## 👤 Autor
 
 Desenvolvido por **Lúcio Macedo**.
-Projeto de estudo para DevOps e Lógica de Programação.
+Projeto de estudo para DevOps, Programação e segurança.
 
 ---
-&copy; 2026 VerificaZap
+&copy; 2026 Connections Test

@@ -91,7 +91,7 @@ Para que as verificações de segurança funcionem corretamente, você precisa c
 ## 👤 Autor
 
 Desenvolvido por **Lúcio Macedo**.
-Projeto de estudo para DevOps e Lógica de Programação.
+Projeto de estudo para DevOps, Programação e segurança.
 
 ---
 &copy; 2026 Connections Test

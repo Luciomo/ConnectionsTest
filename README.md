@@ -94,4 +94,4 @@ Desenvolvido por **Lúcio Macedo**.
 Projeto de estudo para DevOps e Lógica de Programação.
 
 ---
-&copy; 2026 VerificaZap
+&copy; 2026 Connections Test

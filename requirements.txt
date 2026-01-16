@@ -1,7 +1,8 @@
-flask
+Flask
 requests
 python-dotenv
-dnspython
 python-whois
+dnspython
 ping3
 speedtest-cli
+gunicorn

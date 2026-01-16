@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  connections-test:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: connections-test-app
+    ports:
+      - "5500:5500"
+    # Carrega as variáveis de ambiente do arquivo .env (VT_API_KEY, GSB_API_KEY)
+    env_file:
+      - .env
+    environment:
+      - FLASK_DEBUG=1
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - .:/var/task

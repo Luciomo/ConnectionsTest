@@ -23,7 +23,7 @@ cd /home/ec2-user/app
 # ⚠️ IMPORTANTE: Substitua a URL abaixo pelo seu repositório GitHub
 # Se o repositório for privado, use o formato: https://usuario:token_pessoal@github.com/usuario/repo.git
 echo "📥 Clonando repositório..."
-git clone https://Luciomo:github.com/Luciomo/ConnectionsTest.git
+git clone https://Luciomo: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@github.com/Luciomo/ConnectionsTest.git
 
 # 5. Criação do arquivo de variáveis de ambiente (.env)
 # ⚠️ IMPORTANTE: Substitua os valores abaixo pelas suas chaves reais antes de usar no EC2

@@ -48,7 +48,7 @@ After=network.target
 User=ec2-user
 Group=ec2-user
 WorkingDirectory=/home/ec2-user/app
-Environment="PATH=/home/ec2-user/app/venv/bin"
+Environment="PATH=/home/ec2-user/app/venv/bin:/usr/local/bin:/usr/bin:/bin"
 EnvironmentFile=/home/ec2-user/app/.env
 ExecStart=/home/ec2-user/app/venv/bin/gunicorn --workers 3 --bind 0.0.0.0:5500 --timeout 120 app:app
 Restart=always

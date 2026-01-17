@@ -84,14 +84,15 @@ Para que as verificações de segurança funcionem corretamente, você precisa c
 
 ## ☁️ Deploy na AWS EC2
 
-Para rodar esta aplicação em uma instância EC2 (sem Docker):
+Para rodar esta aplicação em uma instância EC2 (Manual/Systemd):
 
 1.  Lance uma instância EC2 (Amazon Linux 2023 ou Ubuntu).
-2.  No campo **User Data** (Detalhes Avançados), cole o conteúdo do script `ec2_user_data.sh` (editando o repositório e chaves).
-3.  Certifique-se de liberar a porta **5500** no Security Group.
-4.  Acesse a aplicação pelo IP público da instância.
+2.  Conecte via SSH e clone o repositório.
+3.  Instale as dependências (`python3`, `pip`, `whois`, `traceroute`).
+4.  Configure o serviço Systemd conforme o arquivo `ec2_user_data.sh` ou instruções manuais.
+5.  Certifique-se de liberar a porta **5500** no Security Group.
 
-Para atualizações automáticas, configure os Secrets no GitHub (`EC2_HOST`, `EC2_USER`, `EC2_SSH_KEY`) e o GitHub Actions fará o deploy a cada push na branch `main`.
+Para atualizações automáticas, o GitHub Actions pode ser configurado para reiniciar o serviço Systemd após o `git pull`.
 
 ## ��📂 Estrutura do Projeto
 

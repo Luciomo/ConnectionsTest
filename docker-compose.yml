@@ -12,7 +12,4 @@ services:
     env_file:
       - .env
     environment:
-      - FLASK_DEBUG=1
       - PYTHONUNBUFFERED=1
-    volumes:
-      - .:/var/task

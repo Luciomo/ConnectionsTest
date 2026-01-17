@@ -2,6 +2,7 @@ import subprocess
 import platform
 import re
 import socket
+import shutil
 
 def extrair_host(url):
     """Remove protocolo e caminhos, deixando apenas o hostname ou IP."""
@@ -44,13 +45,24 @@ def executar_tracert(url):
 
     outputs = []
     sistema = platform.system().lower()
+    
+    # Define o nome base do comando dependendo do SO
+    cmd_base = 'tracert' if sistema == 'windows' else 'traceroute'
+    executable = cmd_base
+
+    # Tenta localizar o executável absoluto se não estiver no PATH (Linux)
+    if sistema != 'windows' and shutil.which(executable) is None:
+        for path in [f'/usr/bin/{cmd_base}', f'/bin/{cmd_base}', f'/usr/sbin/{cmd_base}']:
+            if shutil.which(path):
+                executable = path
+                break
 
     for label, target in targets:
         if sistema == 'windows':
-            cmd = ['tracert', '-d', '-h', '15', target]
+            cmd = [executable, '-d', '-h', '15', target]
             encoding = 'cp850'
         else:
-            cmd = ['traceroute', '-n', '-m', '15', target]
+            cmd = [executable, '-n', '-m', '15', target]
             encoding = 'utf-8'
 
         try:

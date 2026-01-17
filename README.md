@@ -88,7 +88,9 @@ Para rodar esta aplicação em uma instância EC2 (Manual/Systemd):
 
 1.  Lance uma instância EC2 (Amazon Linux 2023 ou Ubuntu).
 2.  Conecte via SSH e clone o repositório.
-3.  Instale as dependências (`python3`, `pip`, `whois`, `traceroute`).
+3.  Instale as dependências do sistema:
+    *   **Amazon Linux 2023:** `sudo dnf install -y python3 python3-pip git whois traceroute iputils libcap`
+    *   **Ubuntu:** `sudo apt update && sudo apt install -y python3-pip git whois traceroute iputils-ping libcap2-bin`
 4.  Configure o serviço Systemd conforme o arquivo `ec2_user_data.sh` ou instruções manuais.
 5.  Certifique-se de liberar a porta **5500** no Security Group.
 

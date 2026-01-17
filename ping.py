@@ -2,6 +2,7 @@ import subprocess
 import platform
 import re
 import socket
+import shutil
 
 def extrair_host(url):
     """Remove protocolo e caminhos, deixando apenas o hostname ou IP."""
@@ -49,13 +50,23 @@ def executar_ping(url):
 
     outputs = []
     sistema = platform.system().lower()
+    
+    # Tenta localizar o executável do ping no sistema
+    ping_cmd = 'ping'
+    if sistema != 'windows' and shutil.which(ping_cmd) is None:
+        # Se não achar no PATH padrão, tenta caminhos comuns de Linux
+        for path in ['/usr/bin/ping', '/bin/ping', '/usr/sbin/ping']:
+            if shutil.which(path):
+                ping_cmd = path
+                break
+    # Se não encontrar, mantém 'ping' e deixará o subprocess lançar o erro original se falhar
 
     for label, target in targets:
         if sistema == 'windows':
-            cmd = ['ping', '-n', '4', target]
+            cmd = [ping_cmd, '-n', '4', target]
             encoding = 'cp850'
         else:
-            cmd = ['ping', '-c', '4', target]
+            cmd = [ping_cmd, '-c', '4', target]
             encoding = 'utf-8'
 
         try:

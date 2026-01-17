@@ -8,6 +8,10 @@
 {% endblock %}
 
 {% block content %}
+    <div style="text-align: center; margin-bottom: 20px;">
+        <span style="font-size: 1em; color: #555;">Seu IP atual: <strong id="client-ip" style="color: #007bff;">Carregando...</strong></span>
+    </div>
+
     <form action="{{ url_for('check') }}" method="POST">
         <input type="text" name="url" placeholder="exemplo.com ou https://exemplo.com" required pattern=".*\S+.*" title="Por favor, digite um endereço válido (não apenas espaços).">
         <button type="submit">Verificar Agora</button>
@@ -16,9 +20,13 @@
 <div class="botoes-inferiores">
     <a href="{{ url_for('dns_page') }}" class="nav-link"> 🌐 Verificar DNS</a>
     <a href="{{ url_for('whois_page') }}" class="nav-link"> 👤 Verificar WHOIS</a>
-    <a href="{{ url_for('ping_page') }}" class="nav-link"> 📶 Testar Ping</a>
-    <a href="{{ url_for('tracert_page') }}" class="nav-link"> 🛣️ Rastrear Rota</a>
     <a href="{{ url_for('connection_page') }}" class="nav-link"> 🚀 Teste Conexão</a>
 </div>
-    
+
+<script>
+    fetch('/api/ping_pong')
+        .then(response => response.json())
+        .then(data => document.getElementById('client-ip').textContent = data.ip)
+        .catch(err => document.getElementById('client-ip').textContent = "Desconhecido");
+</script>
 {% endblock %}

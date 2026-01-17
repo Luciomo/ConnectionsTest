@@ -4,7 +4,7 @@
 
 {% block header %}
     <h1>Resultados da Análise 📊</h1>
-    <p class="url-analisada"><strong>URL Analisada:</strong> {{ url }}</p>
+    <p class="url-analisada"><strong>URL/IP:</strong> {{ url }}</p>
 {% endblock %}
 
 {% block content %}
@@ -147,7 +147,7 @@
                     </div>
                     
                     <div class="conn-item">
-                        <h3>Velocidade</h3>
+                        <h3>Throughput (Velocidade)</h3>
                         {% if conn_result.speedtest_error %}
                             <span class="error">{{ conn_result.speedtest_error }}</span>
                         {% else %}
@@ -196,5 +196,5 @@
             {% endif %}
     </div>
 
-            <a href="{{ url_for('index') }}" class="back-link">Verificar outra URL</a>
+            <a href="{{ url_for('index') }}" class="back-link">Voltar para Home</a>
 {% endblock %}

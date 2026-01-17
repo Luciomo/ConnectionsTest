@@ -219,6 +219,11 @@ def check_connection():
                            active_page='connection',
                            formatar_valor=whois_lookup.formatar_valor)
 
+@app.route('/api/ping_pong')
+def api_ping_pong():
+    """Endpoint leve para medir latência do cliente (browser) até este servidor."""
+    return {"message": "pong", "ip": request.remote_addr}, 200
+
 # --- 4. PONTO DE ENTRADA PRINCIPAL ---
 
 if __name__ == '__main__':

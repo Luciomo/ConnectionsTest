@@ -4,14 +4,72 @@
 
 {% block header %}
     <h1>Teste de Conexão 🚀</h1>
-    <p>Meça Latência, Jitter e Velocidade de Internet.</p>
+    <p>Latência, Jitter e Velocidade de Internet.</p>
 {% endblock %}
 
 {% block content %}
+    <script>
+        // Busca IP ao carregar
+        fetch('/api/ping_pong')
+            .then(r => r.json())
+            .then(d => {
+                const userIpEl = document.getElementById('user-ip');
+                if (userIpEl) userIpEl.textContent = d.ip;
+
+                const urlInput = document.getElementById('target-ip');
+                if (urlInput) {
+                    urlInput.value = d.ip;
+                    document.getElementById('btn-submit').disabled = false;
+                }
+            })
+            .catch(() => document.getElementById('user-ip').textContent = "Indisponível");
+
+        async function iniciarTesteCliente() {
+            const btn = document.querySelector('button[onclick="iniciarTesteCliente()"]');
+            const status = document.getElementById('status-msg');
+            const valDisplay = document.getElementById('latency-value');
+            
+            btn.disabled = true;
+            btn.style.opacity = "0.7";
+            status.textContent = "Testando latência...";
+            valDisplay.textContent = "...";
+
+            let latencies = [];
+            // Realiza 10 pings
+            for(let i=0; i<10; i++) {
+                const start = performance.now();
+                try {
+                    // Adiciona timestamp para evitar cache
+                    await fetch(`/api/ping_pong?t=${Date.now()}`);
+                    const end = performance.now();
+                    latencies.push(end - start);
+                } catch(e) {
+                    console.error(e);
+                }
+                // Pequena pausa entre requisições
+                await new Promise(r => setTimeout(r, 100));
+            }
+
+            if(latencies.length > 0) {
+                const avg = latencies.reduce((a,b)=>a+b,0)/latencies.length;
+                valDisplay.textContent = avg.toFixed(0);
+                status.textContent = `Média calculada com base em ${latencies.length} requisições.`;
+            } else {
+                valDisplay.textContent = "Erro";
+                status.textContent = "Não foi possível conectar ao servidor.";
+            }
+
+            btn.disabled = false;
+            btn.style.opacity = "1";
+        }
+    </script>
+
+    <hr style="margin: 30px 0; border: 0; border-top: 1px solid #eee;">
+    
     <form action="{{ url_for('check_connection') }}" method="POST">
-        <input type="text" name="url" placeholder="exemplo.com ou IP (para teste de latência)" required pattern=".*\S+.*">
-        <button type="submit">Iniciar Teste</button>
+        <input type="hidden" name="url" id="target-ip">
+        <button type="submit" id="btn-submit" disabled>Iniciar Teste</button>
     </form>
-    <p style="font-size: 0.9em; color: #666; margin-top: 10px;">⚠️ O teste de velocidade pode levar até 30 segundos.</p>
+    <p style="font-size: 0.8em; color: #999; margin-top: 5px;">⚠️ O teste de velocidade do servidor pode levar até 30 segundos.</p>
     <a href="{{ url_for('index') }}" class="back-link">← Voltar para Home</a>
 {% endblock %}

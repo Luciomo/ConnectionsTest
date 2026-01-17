@@ -25,5 +25,7 @@ jobs:
             # Baixa as últimas alterações do repositório
             git pull origin main
             
-            # Reconstrói a imagem e reinicia o container em background
-            docker compose up -d --build
+            # Atualiza dependências e reinicia o serviço
+            source venv/bin/activate
+            pip install -r requirements.txt
+            sudo systemctl restart connections-test

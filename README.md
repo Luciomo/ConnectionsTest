@@ -84,16 +84,14 @@ Para que as verificações de segurança funcionem corretamente, você precisa c
 
 ## ☁️ Deploy na AWS EC2
 
-Para rodar esta aplicação em uma instância EC2:
+Para rodar esta aplicação em uma instância EC2 (sem Docker):
 
 1.  Lance uma instância EC2 (Amazon Linux 2023 ou Ubuntu).
-2.  Instale o Docker na instância.
-3.  Copie os arquivos do projeto para a instância (via Git ou SCP).
-4.  Crie o arquivo `.env` com suas chaves de API.
-5.  Construa e rode o container:
-    ```bash
-    docker compose up -d --build
-    ```
+2.  No campo **User Data** (Detalhes Avançados), cole o conteúdo do script `ec2_user_data.sh` (editando o repositório e chaves).
+3.  Certifique-se de liberar a porta **5500** no Security Group.
+4.  Acesse a aplicação pelo IP público da instância.
+
+Para atualizações automáticas, configure os Secrets no GitHub (`EC2_HOST`, `EC2_USER`, `EC2_SSH_KEY`) e o GitHub Actions fará o deploy a cada push na branch `main`.
 
 ## ��📂 Estrutura do Projeto
 

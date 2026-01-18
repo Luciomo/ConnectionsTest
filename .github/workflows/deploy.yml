@@ -25,7 +25,14 @@ jobs:
             # Baixa as últimas alterações do repositório
             git pull origin main
             
+            # Instala dependências do sistema operacional
+            sudo dnf install -y python3 python3-pip git whois traceroute iputils libcap
+            
             # Atualiza dependências e reinicia o serviço
             source venv/bin/activate
             pip install -r requirements.txt
+            
+            # Garante permissões para o Python abrir sockets raw (ping)
+            sudo setcap cap_net_raw+ep /home/ec2-user/app/venv/bin/python3
+            
             sudo systemctl restart connections-test

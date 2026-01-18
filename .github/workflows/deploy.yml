@@ -19,8 +19,11 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           port: 22
           script: |
-            # Navega até a pasta do projeto (criada pelo script User Data)
-            cd /home/ec2-user/app
+            # Interrompe a execução imediatamente se algum comando falhar
+            set -e
+            
+            # Navega até a pasta do repositório
+            cd /home/ec2-user/app/ConnectionsTest
             
             # Baixa as últimas alterações do repositório
             git pull origin main
@@ -33,6 +36,18 @@ jobs:
             pip install -r requirements.txt
             
             # Garante permissões para o Python abrir sockets raw (ping)
-            sudo setcap cap_net_raw+ep /home/ec2-user/app/venv/bin/python3
+            sudo setcap cap_net_raw+ep /home/ec2-user/app/ConnectionsTest/venv/bin/python3
             
             sudo systemctl restart connections-test
+            
+            # Aguarda o serviço iniciar
+            sleep 5
+            
+            # Health Check
+            echo "🏥 Executando Health Check..."
+            if ! curl -f -s -o /dev/null http://18.223.29.225:5500/api/ping_pong; then
+              echo "❌ Erro: A aplicação não respondeu ao Health Check."
+              sudo journalctl -u connections-test -n 20 --no-pager
+              exit 1
+            fi
+            echo "✅ Health Check aprovado!"

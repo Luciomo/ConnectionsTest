@@ -28,7 +28,7 @@ sudo -u ec2-user python3 -m venv venv
 sudo -u ec2-user ./venv/bin/pip install -r requirements.txt
 
 # Permite que o Python abra sockets raw (necessário para o ping3 funcionar sem root)
-setcap cap_net_raw+ep /home/ec2-user/app/venv/bin/python3
+setcap cap_net_raw+ep /home/ec2-user/app/ConnectionsTest/venv/bin/python3
 
 # 5. Criação do arquivo de variáveis de ambiente (.env)
 # ⚠️ IMPORTANTE: Substitua os valores abaixo pelas suas chaves reais antes de usar no EC2
@@ -49,10 +49,10 @@ After=network.target
 [Service]
 User=ec2-user
 Group=ec2-user
-WorkingDirectory=/home/ec2-user/app
-Environment="PATH=/home/ec2-user/app/venv/bin:/usr/local/bin:/usr/bin:/bin"
-EnvironmentFile=/home/ec2-user/app/.env
-ExecStart=/home/ec2-user/app/venv/bin/gunicorn --workers 3 --bind 0.0.0.0:5500 --timeout 120 app:app
+WorkingDirectory=/home/ec2-user/app/ConnectionsTest
+Environment="PATH=/home/ec2-user/app/ConnectionsTest/venv/bin:/usr/local/bin:/usr/bin:/bin"
+EnvironmentFile=/home/ec2-user/app/ConnectionsTest/.env
+ExecStart=/home/ec2-user/app/ConnectionsTest/venv/bin/gunicorn --workers 3 --bind 0.0.0.0:5500 --timeout 120 app:app
 Restart=always
 
 [Install]

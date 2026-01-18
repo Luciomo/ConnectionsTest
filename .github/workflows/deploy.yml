@@ -26,22 +26,15 @@ jobs:
             mkdir -p /home/ec2-user/app
             cd /home/ec2-user/app
             
-            # Verifica se o repositório existe e tem o remote 'origin' configurado corretamente
-            # Se não tiver, remove a pasta para forçar um novo clone (Self-Healing)
-            if [ -d "ConnectionsTest" ]; then
-              cd ConnectionsTest
-              if ! git config remote.origin.url > /dev/null; then
-                echo "⚠️ Repositório corrompido detectado. Recriando..."
-                # Tenta salvar o .env antes de apagar a pasta
-                cp .env ../.env.backup 2>/dev/null || true
-                cd ..
-                rm -rf ConnectionsTest
-              else
-                cd ..
-              fi
+            # 1. Verificação de Integridade (Self-Healing)
+            # Se a pasta existe mas não tem a pasta .git, ela está corrompida.
+            if [ -d "ConnectionsTest" ] && [ ! -d "ConnectionsTest/.git" ]; then
+              echo "⚠️ Pasta encontrada sem .git. Recriando..."
+              cp ConnectionsTest/.env .env.backup 2>/dev/null || true
+              rm -rf ConnectionsTest
             fi
 
-            # Clona o repositório se ele não existir (ou foi removido acima)
+            # 2. Clone (se necessário)
             if [ ! -d "ConnectionsTest" ]; then
               echo "📥 Clonando repositório..."
               git clone https://github.com/Luciomo/ConnectionsTest.git
@@ -53,7 +46,18 @@ jobs:
             fi
             
             cd ConnectionsTest
-            git pull origin main
+            
+            # 3. Correção Forçada do Remote
+            # Garante que 'origin' existe e aponta para o lugar certo
+            if ! git remote | grep -q "^origin$"; then
+                git remote add origin https://github.com/Luciomo/ConnectionsTest.git
+            else
+                git remote set-url origin https://github.com/Luciomo/ConnectionsTest.git
+            fi
+            
+            # 4. Atualização Segura (Fetch + Reset)
+            git fetch origin
+            git reset --hard origin/main
             
             # Instala dependências do sistema operacional
             sudo dnf install -y python3 python3-pip git whois traceroute iputils libcap

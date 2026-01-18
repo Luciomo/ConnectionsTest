@@ -12,6 +12,12 @@
         <span style="font-size: 1em; color: #555;">Seu IP atual: <strong id="client-ip" style="color: #007bff;">Carregando...</strong></span>
     </div>
 
+    {% if proxy_detected %}
+        <div style="text-align: center; margin-bottom: 20px; padding: 10px; background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; border-radius: 5px;">
+            ⚠️ <strong>Atenção:</strong> Uso de Proxy ou VPN detectado via cabeçalhos.
+        </div>
+    {% endif %}
+
     <form action="{{ url_for('check') }}" method="POST">
         <input type="text" name="url" placeholder="exemplo.com ou https://exemplo.com" required pattern=".*\S+.*" title="Por favor, digite um endereço válido (não apenas espaços).">
         <button type="submit">Verificar Agora</button>
@@ -23,10 +29,21 @@
     <a href="{{ url_for('connection_page') }}" class="nav-link"> 🚀 Teste Conexão</a>
 </div>
 
+<div style="text-align: center; margin-top: 15px;">
+    <span id="ipv6-badge" style="display:none; padding: 4px 8px; border-radius: 4px; font-size: 0.8em; font-weight: bold; color: white; background-color: #28a745;">IPv6</span>
+</div>
+
 <script>
     fetch('/api/ping_pong')
         .then(response => response.json())
         .then(data => document.getElementById('client-ip').textContent = data.ip)
         .catch(err => document.getElementById('client-ip').textContent = "Desconhecido");
+
+    fetch('https://api64.ipify.org?format=json')
+        .then(r => r.json())
+        .then(d => {
+            if (d.ip.includes(':')) document.getElementById('ipv6-badge').style.display = 'inline-block';
+        })
+        .catch(e => console.log(e));
 </script>
 {% endblock %}

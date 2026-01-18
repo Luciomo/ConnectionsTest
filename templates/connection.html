@@ -8,23 +8,32 @@
 {% endblock %}
 
 {% block content %}
+    <style>
+        .spinner-btn {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 8px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
     <script>
-        // Busca IP ao carregar
-        fetch('/api/ping_pong')
-            .then(r => r.json())
-            .then(d => {
-                const userIpEl = document.getElementById('user-ip');
-                if (userIpEl) userIpEl.textContent = d.ip;
-
+        fetch('https://api64.ipify.org?format=json')
+            .then(response => response.json())
+            .then(data => {
                 const urlInput = document.getElementById('target-ip');
                 if (urlInput) {
-                    urlInput.value = d.ip;
+                    urlInput.value = data.ip;
                     document.getElementById('btn-submit').disabled = false;
                 }
             })
-            .catch(() => document.getElementById('user-ip').textContent = "Indisponível");
-
-        async function iniciarTesteCliente() {
+            .catch(() => console.log("Erro ao obter IP"));
+        
+       async function iniciarTesteCliente() {
             const btn = document.querySelector('button[onclick="iniciarTesteCliente()"]');
             const status = document.getElementById('status-msg');
             const valDisplay = document.getElementById('latency-value');
@@ -62,6 +71,18 @@
             btn.disabled = false;
             btn.style.opacity = "1";
         }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.querySelector('form[action="{{ url_for("check_connection") }}"]');
+            if(form) {
+                form.addEventListener('submit', function(e) {
+                    e.stopImmediatePropagation(); // Evita o overlay global
+                    const btn = document.getElementById('btn-submit');
+                    btn.disabled = true;
+                    btn.innerHTML = '<span class="spinner-btn"></span> Testando...';
+                });
+            }
+        });
     </script>
 
     <hr style="margin: 30px 0; border: 0; border-top: 1px solid #eee;">

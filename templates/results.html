@@ -87,7 +87,7 @@
                 <h2>Relatório DNS 🌐</h2>
                 {% if dns_result.erro %}
                     <p class="error">❌ {{ dns_result.erro }}</p>
-                {% elif dns_result %}
+                {% else %}
                     <div class="dns-records">
                         {% for tipo, registros in dns_result.items() %}
                             <div class="dns-group">
@@ -100,8 +100,6 @@
                             </div>
                         {% endfor %}
                     </div>
-                {% else %}
-                    <p>Nenhum registro DNS encontrado.</p>
                 {% endif %}
             </div>
             {% endif %}
@@ -143,6 +141,13 @@
                         {% else %}
                             <span class="value">{{ "%.2f"|format(conn_result.avg_latency) }} ms</span>
                             <small>Jitter: {{ "%.2f"|format(conn_result.jitter) }} ms</small>
+                            {% if conn_result.avg_latency > 100 or conn_result.jitter > 20 %}
+                                <div style="margin-top: 10px; padding: 8px; border: 1px solid var(--malicious-color); border-radius: 4px; color: var(--malicious-color); font-size: 0.85em; background-color: rgba(220, 53, 69, 0.05); text-align: left;">
+                                    <strong>⚠️ Instabilidade detectada:</strong>
+                                    {% if conn_result.avg_latency > 100 %}<div>• Latência alta (>100ms)</div>{% endif %}
+                                    {% if conn_result.jitter > 20 %}<div>• Jitter alto (>20ms)</div>{% endif %}
+                                </div>
+                            {% endif %}
                         {% endif %}
                     </div>
                     
@@ -157,7 +162,7 @@
                                 <canvas id="speedChart"></canvas>
                             </div>
                             <script>
-                            /*    document.addEventListener('DOMContentLoaded', function() {
+                                document.addEventListener('DOMContentLoaded', function() {
                                     const ctx = document.getElementById('speedChart').getContext('2d');
                                     new Chart(ctx, {
                                         type: 'bar',
@@ -187,10 +192,16 @@
                                             }
                                         }
                                     });
-                                });*/
+                                });
                             </script>
                         {% endif %}
                     </div>
+                </div>
+                <div style="text-align: center; margin-top: 20px; padding-top: 15px; border-top: 1px solid #eee;">
+                    <form action="{{ url_for('check_connection') }}" method="POST">
+                        <input type="hidden" name="url" value="{{ url }}">
+                        <button type="submit" style="cursor: pointer; padding: 10px 20px; background-color: #007bff; color: white; border: none; border-radius: 5px; font-size: 1rem;">🔄 Refazer Teste</button>
+                    </form>
                 </div>
             </div>
             {% endif %}

@@ -6,6 +6,7 @@ import sys
 import re
 import json
 import datetime
+import time
 from dotenv import load_dotenv
 from flask import Flask, render_template, request, redirect, url_for
 
@@ -23,6 +24,13 @@ app = Flask(__name__)
 def inject_year():
     """Injeta o ano atual em todos os templates."""
     return {'current_year': datetime.datetime.now().year}
+
+# Dicionário para controle de Rate Limiting (IP -> Timestamp da última requisição)
+CLIENT_LAST_TEST = {}
+
+# Cache simples para VirusTotal (URL -> (Resultado, Timestamp))
+VT_CACHE = {}
+VT_CACHE_TIMEOUT = 600  # 10 minutos (600 segundos)
 
 # --- 2. LÓGICA DE VERIFICAÇÃO DE URLS ---
 # (Anteriormente em validador_url.py)
@@ -52,6 +60,13 @@ def normalizar_url(url):
 
 def verificar_com_virustotal(url):
     """Verifica uma URL com VirusTotal e retorna um dicionário com os resultados."""
+    # Verifica se o resultado está em cache e é válido
+    now = time.time()
+    if url in VT_CACHE:
+        resultado, timestamp = VT_CACHE[url]
+        if now - timestamp < VT_CACHE_TIMEOUT:
+            return resultado
+
     if not VT_API_KEY or VT_API_KEY == 'coloque_sua_chave_aqui':
         return {"serviço": "VirusTotal", "erro": "Chave de API não configurada."}
 
@@ -63,9 +78,13 @@ def verificar_com_virustotal(url):
 
         if response.status_code == 200:
             stats = response.json().get('data', {}).get('attributes', {}).get('last_analysis_stats', {})
-            return {"serviço": "VirusTotal", "malicioso": stats.get('malicious', 0), "suspeito": stats.get('suspicious', 0), "seguro": stats.get('harmless', 0) + stats.get('undetected', 0)}
+            resultado = {"serviço": "VirusTotal", "malicioso": stats.get('malicious', 0), "suspeito": stats.get('suspicious', 0), "seguro": stats.get('harmless', 0) + stats.get('undetected', 0)}
+            VT_CACHE[url] = (resultado, now)
+            return resultado
         elif response.status_code == 404:
-            return {"serviço": "VirusTotal", "status": "Não encontrado no banco de dados."}
+            resultado = {"serviço": "VirusTotal", "status": "Não encontrado no banco de dados."}
+            VT_CACHE[url] = (resultado, now)
+            return resultado
         else:
             return {"serviço": "VirusTotal", "erro": f"Erro na API: {response.status_code}"}
     except Exception as e:
@@ -104,7 +123,11 @@ def verificar_com_google(url):
 @app.route('/')
 def index():
     """Renderiza a página inicial com o formulário."""
-    return render_template('index.html', active_page='home')
+    # Verifica headers que indicam uso de Proxy/VPN
+    proxy_headers = ['Via', 'X-Forwarded-For', 'Forwarded', 'Client-IP']
+    proxy_detected = any(request.headers.get(h) for h in proxy_headers)
+    
+    return render_template('index.html', active_page='home', proxy_detected=proxy_detected)
 
 @app.route('/check', methods=['POST'])
 def check():
@@ -206,6 +229,22 @@ def connection_page():
 @app.route('/check_connection', methods=['POST'])
 def check_connection():
     """Realiza o teste de conexão (Latência, Jitter, Speedtest)."""
+    # Rate Limiting: Impede abusos no teste de conexão (pesado)
+    client_ip = request.remote_addr
+    now = time.time()
+    last_time = CLIENT_LAST_TEST.get(client_ip, 0)
+    cooldown = 30  # Tempo de espera em segundos
+
+    if now - last_time < cooldown:
+        remaining = int(cooldown - (now - last_time))
+        return render_template('results.html', 
+                               url=request.form.get('url'), 
+                               conn_result={'latency_error': f"Aguarde {remaining}s", 'speedtest_error': f"Muitas tentativas. Tente em {remaining}s."}, 
+                               active_page='connection',
+                               formatar_valor=whois_lookup.formatar_valor)
+
+    CLIENT_LAST_TEST[client_ip] = now
+
     url = request.form.get('url')
     # Extrai apenas o host/IP para o ping3 funcionar corretamente
     host = ping.extrair_host(url)

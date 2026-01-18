@@ -32,8 +32,8 @@
 1.  **Clone o repositório ou baixe os arquivos:**
 
     ```bash
-    git clone https://github.com/seu-usuario/VerificaZap.git
-    cd VerificaZap
+    git clone https://github.com/seu-usuario/ConnectionsTest.git
+    cd ConnectionsTest
     ```
 
 2.  **Crie um ambiente virtual (Recomendado):**
@@ -94,7 +94,7 @@ Para rodar esta aplicação em uma instância EC2 (Manual/Systemd):
 4.  Configure o serviço Systemd conforme o arquivo `ec2_user_data.sh` ou instruções manuais.
 5.  Certifique-se de liberar a porta **5500** no Security Group.
 
-Para atualizações automáticas, o GitHub Actions pode ser configurado para reiniciar o serviço Systemd após o `git pull`.
+Para atualizações automáticas, o workflow `.github/workflows/deploy.yml` já está configurado para realizar o deploy e reiniciar o serviço `connections-test` após alterações na branch `main`.
 
 ## ��📂 Estrutura do Projeto
 

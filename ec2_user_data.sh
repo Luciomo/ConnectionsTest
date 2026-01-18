@@ -18,7 +18,7 @@ cd /home/ec2-user/app
 # ⚠️ IMPORTANTE: Substitua a URL abaixo pelo seu repositório GitHub
 # Se o repositório for privado, use o formato: https://usuario:token_pessoal@github.com/usuario/repo.git
 echo "📥 Clonando repositório..."
-sudo -u ec2-user git clone https://github.com/seu-usuario/VerificaZap.git .
+sudo -u ec2-user git clone https://Luciomo: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@github.com/seu-usuario/VerificaZap.git .
 
 # 4. Configuração do Ambiente Python
 echo "🐍 Configurando Python Venv..."

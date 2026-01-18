@@ -34,8 +34,8 @@ setcap cap_net_raw+ep /home/ec2-user/app/ConnectionsTest/venv/bin/python3
 # ⚠️ IMPORTANTE: Substitua os valores abaixo pelas suas chaves reais antes de usar no EC2
 echo "🔑 Configurando variáveis de ambiente..."
 cat <<EOF > .env
-VT_API_KEY=sua_chave_do_virustotal_aqui
-GSB_API_KEY=sua_chave_do_google_safe_browsing_aqui
+VT_API_KEY=b2e21b6cfb0e32f3ea049d3077afa4aac321cf22481af3c430cc003eaee4295e
+GSB_API_KEY=IzaSyDutddvVDU7maS1Hj6FrQcEWvYCYCAi0B0
 EOF
 chown ec2-user:ec2-user .env
 

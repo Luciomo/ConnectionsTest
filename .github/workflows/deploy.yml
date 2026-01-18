@@ -22,10 +22,30 @@ jobs:
             # Interrompe a execução imediatamente se algum comando falhar
             set -e
             
-            # Navega até a pasta do repositório
-            cd /home/ec2-user/app/ConnectionsTest
+            # Garante que a pasta base existe
+            mkdir -p /home/ec2-user/app
+            cd /home/ec2-user/app
             
-            # Baixa as últimas alterações do repositório
+            # Verifica se o repositório existe e tem o remote 'origin' configurado corretamente
+            # Se não tiver, remove a pasta para forçar um novo clone (Self-Healing)
+            if [ -d "ConnectionsTest" ]; then
+              cd ConnectionsTest
+              if ! git config remote.origin.url > /dev/null; then
+                echo "⚠️ Repositório corrompido detectado. Recriando..."
+                cd ..
+                rm -rf ConnectionsTest
+              else
+                cd ..
+              fi
+            fi
+
+            # Clona o repositório se ele não existir (ou foi removido acima)
+            if [ ! -d "ConnectionsTest" ]; then
+              echo "📥 Clonando repositório..."
+              git clone https://github.com/Luciomo/ConnectionsTest.git
+            fi
+            
+            cd ConnectionsTest
             git pull origin main
             
             # Instala dependências do sistema operacional

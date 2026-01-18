@@ -12,8 +12,7 @@ from flask import Flask, render_template, request, redirect, url_for
 
 import whois_lookup
 import dns_lookup
-import ping
-import tracert
+import ping3
 import connection_test
 
 # --- 1. CONFIGURAÇÃO E INICIALIZAÇÃO ---

@@ -47,7 +47,10 @@ jobs:
             echo "🏥 Executando Health Check..."
             if ! curl -f -s -o /dev/null http://127.0.0.1:5500/api/ping_pong; then
               echo "❌ Erro: A aplicação não respondeu ao Health Check."
-              sudo journalctl -u connections-test -n 20 --no-pager
+              echo "🔍 Status do serviço:"
+              sudo systemctl status connections-test -l --no-pager
+              echo "📜 Últimos 50 logs da aplicação:"
+              sudo journalctl -u connections-test -n 50 --no-pager
               exit 1
             fi
             echo "✅ Health Check aprovado!"

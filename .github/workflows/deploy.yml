@@ -32,6 +32,8 @@ jobs:
               cd ConnectionsTest
               if ! git config remote.origin.url > /dev/null; then
                 echo "⚠️ Repositório corrompido detectado. Recriando..."
+                # Tenta salvar o .env antes de apagar a pasta
+                cp .env ../.env.backup 2>/dev/null || true
                 cd ..
                 rm -rf ConnectionsTest
               else
@@ -43,6 +45,11 @@ jobs:
             if [ ! -d "ConnectionsTest" ]; then
               echo "📥 Clonando repositório..."
               git clone https://github.com/Luciomo/ConnectionsTest.git
+              
+              # Restaura o arquivo .env se houver backup
+              if [ -f ".env.backup" ]; then
+                mv .env.backup ConnectionsTest/.env
+              fi
             fi
             
             cd ConnectionsTest
@@ -50,6 +57,12 @@ jobs:
             
             # Instala dependências do sistema operacional
             sudo dnf install -y python3 python3-pip git whois traceroute iputils libcap
+            
+            # Recria o ambiente virtual se ele não existir (necessário após um novo clone)
+            if [ ! -d "venv" ]; then
+              echo "🐍 Criando ambiente virtual..."
+              python3 -m venv venv
+            fi
             
             # Atualiza dependências e reinicia o serviço
             source venv/bin/activate

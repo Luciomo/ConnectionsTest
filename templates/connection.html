@@ -4,93 +4,119 @@
 
 {% block header %}
     <h1>Teste de Conexão 🚀</h1>
-    <p>Latência, Jitter e Velocidade de Internet.</p>
+    <p>Verifique a qualidade da <strong>sua</strong> conexão com este servidor.</p>
 {% endblock %}
 
 {% block content %}
     <style>
-        .spinner-btn {
-            display: inline-block;
-            width: 12px;
-            height: 12px;
-            border: 2px solid rgba(255,255,255,0.3);
-            border-radius: 50%;
-            border-top-color: #fff;
-            animation: spin 1s ease-in-out infinite;
-            margin-right: 8px;
+        .value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            display: block;
+            margin: 10px 0;
         }
-        @keyframes spin { to { transform: rotate(360deg); } }
     </style>
+    
+    <div class="card">
+        <div style="text-align: center; margin-bottom: 20px;">
+            <p><strong>Seu IP Público:</strong> <span id="client-ip">Carregando...</span></p>
+        </div>
+
+        <div class="conn-grid">
+            <div class="conn-item">
+                <h3>Latência (Ping)</h3>
+                <span class="value" id="latency-value">--</span> 
+                <span style="font-size: 0.9em; color: #666;">ms</span>
+            </div>
+            <div class="conn-item">
+                <h3>Jitter</h3>
+                <span class="value" id="jitter-value">--</span> 
+                <span style="font-size: 0.9em; color: #666;">ms</span>
+            </div>
+        </div>
+
+        <div id="status-msg" style="margin-top: 20px; color: #666; font-style: italic; text-align: center; min-height: 1.5em;">
+            Clique no botão para iniciar.
+        </div>
+
+        <div style="text-align: center; margin-top: 20px;">
+            <button onclick="iniciarTesteCliente()" id="btn-start" style="padding: 12px 25px; font-size: 1.1em;">
+                ▶️ Iniciar Teste
+            </button>
+        </div>
+    </div>
+
     <script>
         fetch('https://api64.ipify.org?format=json')
             .then(response => response.json())
             .then(data => {
-                const urlInput = document.getElementById('target-ip');
-                if (urlInput) {
-                    urlInput.value = data.ip;
-                    document.getElementById('btn-submit').disabled = false;
-                }
+                const ipSpan = document.getElementById('client-ip');
+                if (ipSpan) ipSpan.textContent = data.ip;
             })
-            .catch(() => console.log("Erro ao obter IP"));
+            .catch(() => {
+                document.getElementById('client-ip').textContent = "Indisponível";
+            });
         
        async function iniciarTesteCliente() {
-            const btn = document.querySelector('button[onclick="iniciarTesteCliente()"]');
+            const btn = document.getElementById('btn-start');
             const status = document.getElementById('status-msg');
-            const valDisplay = document.getElementById('latency-value');
+            const latDisplay = document.getElementById('latency-value');
+            const jitDisplay = document.getElementById('jitter-value');
             
             btn.disabled = true;
             btn.style.opacity = "0.7";
             status.textContent = "Testando latência...";
-            valDisplay.textContent = "...";
+            latDisplay.textContent = "...";
+            jitDisplay.textContent = "...";
 
             let latencies = [];
-            // Realiza 10 pings
-            for(let i=0; i<10; i++) {
+            const iterations = 10;
+
+            // Realiza pings sequenciais
+            for(let i=0; i < iterations; i++) {
                 const start = performance.now();
                 try {
                     // Adiciona timestamp para evitar cache
                     await fetch(`/api/ping_pong?t=${Date.now()}`);
                     const end = performance.now();
-                    latencies.push(end - start);
+                    const duration = end - start;
+                    latencies.push(duration);
+                    
+                    status.textContent = `Enviando pacote ${i+1}/${iterations}... (${duration.toFixed(0)}ms)`;
                 } catch(e) {
                     console.error(e);
                 }
-                // Pequena pausa entre requisições
-                await new Promise(r => setTimeout(r, 100));
+                // Pequena pausa entre requisições para não floodar
+                await new Promise(r => setTimeout(r, 200));
             }
 
             if(latencies.length > 0) {
-                const avg = latencies.reduce((a,b)=>a+b,0)/latencies.length;
-                valDisplay.textContent = avg.toFixed(0);
-                status.textContent = `Média calculada com base em ${latencies.length} requisições.`;
+                // Cálculo da Média
+                const avg = latencies.reduce((a,b)=>a+b,0) / latencies.length;
+                
+                // Cálculo do Jitter (Média das diferenças absolutas entre pings consecutivos)
+                let jitterSum = 0;
+                for (let i = 0; i < latencies.length - 1; i++) {
+                    jitterSum += Math.abs(latencies[i] - latencies[i+1]);
+                }
+                const jitter = latencies.length > 1 ? jitterSum / (latencies.length - 1) : 0;
+
+                latDisplay.textContent = avg.toFixed(1);
+                jitDisplay.textContent = jitter.toFixed(1);
+                
+                status.innerHTML = `✅ Teste concluído com sucesso!`;
             } else {
-                valDisplay.textContent = "Erro";
-                status.textContent = "Não foi possível conectar ao servidor.";
+                latDisplay.textContent = "Erro";
+                jitDisplay.textContent = "Erro";
+                status.textContent = "❌ Não foi possível conectar ao servidor.";
             }
 
             btn.disabled = false;
             btn.style.opacity = "1";
+            btn.textContent = "🔄 Refazer Teste";
         }
-
-        document.addEventListener('DOMContentLoaded', function() {
-            const form = document.querySelector('form[action="{{ url_for("check_connection") }}"]');
-            if(form) {
-                form.addEventListener('submit', function(e) {
-                    e.stopImmediatePropagation(); // Evita o overlay global
-                    const btn = document.getElementById('btn-submit');
-                    btn.disabled = true;
-                    btn.innerHTML = '<span class="spinner-btn"></span> Testando...';
-                });
-            }
-        });
     </script>
 
-    <hr style="margin: 30px 0; border: 0; border-top: 1px solid #eee;">
-    
-    <form action="{{ url_for('check_connection') }}" method="POST">
-        <input type="hidden" name="url" id="target-ip">
-        <button type="submit" id="btn-submit" disabled>Iniciar Teste</button>
-    </form>
-    <p style="font-size: 0.8em; color: #999; margin-top: 5px;">⚠️ O teste de velocidade do servidor pode levar até 30 segundos.</p>
     <a href="{{ url_for('index') }}" class="back-link">← Voltar para Home</a>
 {% endblock %}

@@ -1,10 +1,10 @@
 {% extends "base.html" %}
 
-{% block title %}Teste de Conexão - VerificaZap{% endblock %}
+{% block title %}Teste de Conexão{% endblock %}
 
 {% block header %}
     <h1>Teste de Conexão 🚀</h1>
-    <p>Verifique a qualidade da <strong>sua</strong> conexão com este servidor.</p>
+    <p>Verifique a qualidade da <strong>sua</strong> conexão com a Internet.</p>
 {% endblock %}
 
 {% block content %}
@@ -83,6 +83,10 @@
             jitDisplay.textContent = "...";
             dlDisplay.textContent = "--";
             ulDisplay.textContent = "--";
+            
+            // Reseta as cores para o padrão ao iniciar um novo teste
+            dlDisplay.style.color = "";
+            ulDisplay.style.color = "";
 
             let latencies = [];
             const iterations = 10;
@@ -133,6 +137,7 @@
                     const dlSpeedMbps = (dlSizeBits / dlDurationSec) / 1_000_000;
                     
                     dlDisplay.textContent = dlSpeedMbps.toFixed(2);
+                    dlDisplay.style.color = getSpeedColor(dlSpeedMbps);
                 } catch(e) {
                     console.error("Erro no download:", e);
                     dlDisplay.textContent = "Erro";
@@ -156,6 +161,7 @@
                     const ulSpeedMbps = (ulSizeBits / ulDurationSec) / 1_000_000;
                     
                     ulDisplay.textContent = ulSpeedMbps.toFixed(2);
+                    ulDisplay.style.color = getSpeedColor(ulSpeedMbps);
                 } catch(e) {
                     console.error("Erro no upload:", e);
                     ulDisplay.textContent = "Erro";
@@ -171,6 +177,12 @@
             btn.disabled = false;
             btn.style.opacity = "1";
             btn.textContent = "🔄 Refazer Teste";
+        }
+
+        function getSpeedColor(mbps) {
+            if (mbps >= 20) return '#28a745'; // Verde (Rápido)
+            if (mbps >= 5) return '#ffc107';  // Amarelo (Médio)
+            return '#dc3545';                 // Vermelho (Lento)
         }
     </script>
 

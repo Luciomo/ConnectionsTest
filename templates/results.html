@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Resultados da Análise - VerificaSite{% endblock %}
+{% block title %}Resultados da Análise{% endblock %}
 
 {% block header %}
     <h1>Resultados da Análise 📊</h1>
@@ -160,40 +160,11 @@
                             <p>⬆️ Upload: <strong>{{ "%.2f"|format(conn_result.upload) }} Mbps</strong></p>
                             <div style="position: relative; height:200px; width:100%">
                                 <canvas id="speedChart"></canvas>
+                                <div id="chart-error" style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; align-items: center; justify-content: center; background: rgba(255,255,255,0.9);">
+                                    <p style="color: #dc3545; font-weight: bold;">⚠️ Não foi possível carregar o gráfico.</p>
+                                </div>
                             </div>
-                            <script>
-                                document.addEventListener('DOMContentLoaded', function() {
-                                    const ctx = document.getElementById('speedChart').getContext('2d');
-                                    new Chart(ctx, {
-                                        type: 'bar',
-                                        data: {
-                                            labels: ['Download', 'Upload'],
-                                            datasets: [{
-                                                label: 'Velocidade (Mbps)',
-                                                data: [{{ conn_result.download }}, {{ conn_result.upload }}],
-                                                backgroundColor: [
-                                                    'rgba(54, 162, 235, 0.6)',
-                                                    'rgba(75, 192, 192, 0.6)'
-                                                ],
-                                                borderColor: [
-                                                    'rgba(54, 162, 235, 1)',
-                                                    'rgba(75, 192, 192, 1)'
-                                                ],
-                                                borderWidth: 1
-                                            }]
-                                        },
-                                        options: {
-                                            responsive: true,
-                                            maintainAspectRatio: false,
-                                            scales: {
-                                                y: {
-                                                    beginAtZero: true
-                                                }
-                                            }
-                                        }
-                                    });
-                                });
-                            </script>
+                           
                         {% endif %}
                     </div>
                 </div>

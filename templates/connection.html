@@ -174,5 +174,15 @@
         }
     </script>
 
+    <div class="card" style="margin-top: 20px;">
+        <h3>📚 Entenda os Resultados</h3>
+        <ul style="padding-left: 20px; line-height: 1.6;">
+            <li style="margin-bottom: 10px;"><strong>Latência (Ping):</strong> O tempo que um dado leva para ir do seu dispositivo até o servidor e voltar. Quanto menor, melhor (ideal < 50ms).</li>
+            <li style="margin-bottom: 10px;"><strong>Jitter:</strong> A variação da latência ao longo do tempo. Se oscilar muito, causa travamentos em chamadas de vídeo e jogos.</li>
+            <li style="margin-bottom: 10px;"><strong>Taxa de Download:</strong> A velocidade de recebimento de dados (ex: carregar sites, assistir vídeos). Medido em Mbps.</li>
+            <li style="margin-bottom: 10px;"><strong>Taxa de Upload:</strong> A velocidade de envio de dados (ex: enviar arquivos, transmitir sua câmera). Medido em Mbps.</li>
+        </ul>
+    </div>
+
     <a href="{{ url_for('index') }}" class="back-link">← Voltar para Home</a>
 {% endblock %}

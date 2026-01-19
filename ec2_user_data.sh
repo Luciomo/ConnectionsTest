@@ -58,8 +58,8 @@ WantedBy=multi-user.target
 EOF
 
 # 7. Iniciar Serviço
-systemctl daemon-reload
-systemctl start connections-test
-systemctl enable connections-test
+sudo systemctl daemon-reload
+sudo systemctl start connections-test
+sudo systemctl enable connections-test
 
 echo "✅ Deploy concluído! A aplicação deve estar rodando na porta 5500 via Systemd."

@@ -19,7 +19,6 @@ cd /home/ec2-user/app
 # Se o repositório for privado, use o formato: https://usuario:token_pessoal@github.com/usuario/repo.git
 echo "📥 Clonando repositório..."
 sudo -u ec2-user git clone https://github.com/Luciomo/ConnectionsTest.git
-cd ConnectionsTest
 
 
 # 4. Configuração do Ambiente Python

@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import whois
+import requests
 import sys
 from urllib.parse import urlparse
 import json
@@ -90,6 +91,25 @@ def simple_socket_whois(domain):
     except Exception as e:
         return {"erro": f"Falha no fallback socket: {str(e)}"}
 
+def obter_geolocalizacao(dominio):
+    """Tenta obter a localização física do servidor do domínio."""
+    try:
+        ip = socket.gethostbyname(dominio)
+        # API pública gratuita (ip-api.com)
+        response = requests.get(f"http://ip-api.com/json/{ip}", timeout=3)
+        if response.status_code == 200:
+            data = response.json()
+            if data.get('status') == 'success':
+                loc_parts = [data.get(k) for k in ['city', 'regionName', 'country'] if data.get(k)]
+                return {
+                    "text": f"{', '.join(loc_parts)} (IP: {ip})",
+                    "lat": data.get("lat"),
+                    "lon": data.get("lon")
+                }
+    except Exception:
+        pass
+    return None
+
 def consultar_whois(url):
     """Realiza a consulta WHOIS para o domínio da URL fornecida."""
     dominio = extrair_dominio(url)
@@ -104,13 +124,27 @@ def consultar_whois(url):
             w = whois.query(dominio)
         else:
             return {"erro": "Método de consulta não encontrado. Verifique se instalou 'python-whois'."}
+        
+        # Adiciona geolocalização se possível
+        geo = obter_geolocalizacao(dominio)
+        if geo and isinstance(w, dict):
+            w['geolocation'] = geo['text']
+            w['geo_lat'] = geo['lat']
+            w['geo_lon'] = geo['lon']
+            
         return w
     except Exception as e:
         # Se for erro de arquivo não encontrado (WinError 2), usa o fallback
         erro_str = str(e)
         if "[WinError 2]" in erro_str or isinstance(e, FileNotFoundError):
             print(f"⚠️  Executável whois não encontrado. Usando método socket direto...")
-            return simple_socket_whois(dominio)
+            w = simple_socket_whois(dominio)
+            geo = obter_geolocalizacao(dominio)
+            if geo and isinstance(w, dict):
+                w['geolocation'] = geo['text']
+                w['geo_lat'] = geo['lat']
+                w['geo_lon'] = geo['lon']
+            return w
         return {"erro": f"Falha na consulta WHOIS: {erro_str}"}
 
 def formatar_valor(valor):

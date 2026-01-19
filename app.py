@@ -262,6 +262,24 @@ def api_ping_pong():
     """Endpoint leve para medir latência do cliente (browser) até este servidor."""
     return {"message": "pong", "ip": request.remote_addr}, 200
 
+@app.route('/api/speedtest/download')
+def api_speedtest_download():
+    """Endpoint para teste de download (gera ~5MB de dados)."""
+    # Gera 5 chunks de 1MB
+    def generate():
+        chunk = b'0' * 1024 * 1024  # 1MB
+        for _ in range(5):
+            yield chunk
+    
+    return app.response_class(generate(), mimetype='application/octet-stream')
+
+@app.route('/api/speedtest/upload', methods=['POST'])
+def api_speedtest_upload():
+    """Endpoint para teste de upload (recebe dados e descarta)."""
+    # Lê os dados para garantir que o upload ocorreu, mas não processa
+    _ = request.get_data()
+    return "ok", 200
+
 # --- 4. PONTO DE ENTRADA PRINCIPAL ---
 
 if __name__ == '__main__':

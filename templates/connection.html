@@ -34,6 +34,16 @@
                 <span class="value" id="jitter-value">--</span> 
                 <span style="font-size: 0.9em; color: #666;">ms</span>
             </div>
+            <div class="conn-item">
+                <h3>Download</h3>
+                <span class="value" id="download-value">--</span> 
+                <span style="font-size: 0.9em; color: #666;">Mbps</span>
+            </div>
+            <div class="conn-item">
+                <h3>Upload</h3>
+                <span class="value" id="upload-value">--</span> 
+                <span style="font-size: 0.9em; color: #666;">Mbps</span>
+            </div>
         </div>
 
         <div id="status-msg" style="margin-top: 20px; color: #666; font-style: italic; text-align: center; min-height: 1.5em;">
@@ -63,12 +73,16 @@
             const status = document.getElementById('status-msg');
             const latDisplay = document.getElementById('latency-value');
             const jitDisplay = document.getElementById('jitter-value');
+            const dlDisplay = document.getElementById('download-value');
+            const ulDisplay = document.getElementById('upload-value');
             
             btn.disabled = true;
             btn.style.opacity = "0.7";
             status.textContent = "Testando latência...";
             latDisplay.textContent = "...";
             jitDisplay.textContent = "...";
+            dlDisplay.textContent = "--";
+            ulDisplay.textContent = "--";
 
             let latencies = [];
             const iterations = 10;
@@ -105,6 +119,48 @@
                 latDisplay.textContent = avg.toFixed(1);
                 jitDisplay.textContent = jitter.toFixed(1);
                 
+                // --- Teste de Download ---
+                status.textContent = "Testando Download (5MB)...";
+                dlDisplay.textContent = "...";
+                try {
+                    const dlStart = performance.now();
+                    const response = await fetch('/api/speedtest/download');
+                    const blob = await response.blob();
+                    const dlEnd = performance.now();
+                    
+                    const dlDurationSec = (dlEnd - dlStart) / 1000;
+                    const dlSizeBits = blob.size * 8;
+                    const dlSpeedMbps = (dlSizeBits / dlDurationSec) / 1_000_000;
+                    
+                    dlDisplay.textContent = dlSpeedMbps.toFixed(2);
+                } catch(e) {
+                    console.error("Erro no download:", e);
+                    dlDisplay.textContent = "Erro";
+                }
+
+                // --- Teste de Upload ---
+                status.textContent = "Testando Upload (2MB)...";
+                ulDisplay.textContent = "...";
+                try {
+                    // Cria payload de 2MB
+                    const ulData = new Uint8Array(2 * 1024 * 1024); 
+                    const ulStart = performance.now();
+                    await fetch('/api/speedtest/upload', {
+                        method: 'POST',
+                        body: ulData
+                    });
+                    const ulEnd = performance.now();
+                    
+                    const ulDurationSec = (ulEnd - ulStart) / 1000;
+                    const ulSizeBits = ulData.length * 8;
+                    const ulSpeedMbps = (ulSizeBits / ulDurationSec) / 1_000_000;
+                    
+                    ulDisplay.textContent = ulSpeedMbps.toFixed(2);
+                } catch(e) {
+                    console.error("Erro no upload:", e);
+                    ulDisplay.textContent = "Erro";
+                }
+
                 status.innerHTML = `✅ Teste concluído com sucesso!`;
             } else {
                 latDisplay.textContent = "Erro";

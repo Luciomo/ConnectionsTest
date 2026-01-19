@@ -12,7 +12,6 @@ dnf install -y python3 python3-pip git whois traceroute iputils libcap
 # 2. Preparação do Diretório da Aplicação
 mkdir -p /home/ec2-user/app
 chown ec2-user:ec2-user /home/ec2-user/app
-cd /home/ec2-user/app
 
 # 3. Obtenção do Código Fonte
 # ⚠️ IMPORTANTE: Substitua a URL abaixo pelo seu repositório GitHub

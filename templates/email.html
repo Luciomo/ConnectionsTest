@@ -12,7 +12,7 @@
         /* Estilos para garantir que o input de e-mail tenha a mesma aparência dos inputs de texto */
         input[type="email"] {
             width: 100%;
-            padding: 12px 20px;
+            padding: 12px 40px 12px 20px; /* Espaço extra à direita para o ícone */
             margin: 8px 0;
             display: inline-block;
             border: 1px solid #ccc;
@@ -43,10 +43,45 @@
             border-color: #dc3545 !important;
             box-shadow: 0 0 5px rgba(220, 53, 69, 0.5);
         }
+
+        /* Wrapper para posicionamento do ícone */
+        .input-wrapper {
+            position: relative;
+            width: 100%;
+        }
+
+        .validation-icon {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.2rem;
+            pointer-events: none;
+            display: none;
+        }
+
+        input.valid + .validation-icon::after {
+            content: '✔';
+            color: #28a745;
+        }
+
+        input.invalid + .validation-icon::after {
+            content: '✖';
+            color: #dc3545;
+        }
+
+        /* Mostrar o ícone quando o input tiver classe valid ou invalid */
+        input.valid + .validation-icon,
+        input.invalid + .validation-icon {
+            display: block;
+        }
     </style>
 
     <form action="{{ url_for('check_email') }}" method="POST" id="emailForm">
-        <input type="email" name="email" id="emailInput" placeholder="exemplo@spam.com" required>
+        <div class="input-wrapper">
+            <input type="email" name="email" id="emailInput" placeholder="exemplo@spam.com" required>
+            <span class="validation-icon"></span>
+        </div>
         <button type="submit">Verificar E-mail</button>
     </form>
     <a href="{{ url_for('index') }}" class="back-link">Voltar para Home</a>

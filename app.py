@@ -13,6 +13,7 @@ from flask import Flask, render_template, request, redirect, url_for
 import whois_lookup
 import dns_lookup
 import ping3
+import email_check
 import connection_test
 
 # --- 1. CONFIGURAÇÃO E INICIALIZAÇÃO ---
@@ -180,6 +181,25 @@ def check_whois():
     
     # Passa None para os outros resultados
     return render_template('results.html', url=url_normalized, vt_result=None, gsb_result=None, whois_result=whois_result, dns_result=None, formatar_valor=whois_lookup.formatar_valor, active_page='whois')
+
+@app.route('/email')
+def email_page():
+    """Renderiza a página específica de verificação de e-mail."""
+    return render_template('email.html', active_page='email')
+
+@app.route('/check_email', methods=['POST'])
+def check_email():
+    """Realiza a verificação de e-mail na base de spam."""
+    email = request.form.get('email')
+    
+    # Realiza a consulta
+    email_result = email_check.verificar_email(email)
+    
+    return render_template('results.html', 
+                           url=email, 
+                           email_result=email_result, 
+                           active_page='email',
+                           formatar_valor=whois_lookup.formatar_valor)
 
 @app.route('/ping')
 def ping_page():

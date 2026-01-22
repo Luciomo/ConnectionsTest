@@ -20,6 +20,7 @@
             <a href="{{ url_for('index') }}" class="nav-link {{ 'active' if active_page == 'home' else '' }}">🏠 Home</a>
             <a href="{{ url_for('dns_page') }}" class="nav-link {{ 'active' if active_page == 'dns' else '' }}">🌐 DNS</a>
             <a href="{{ url_for('whois_page') }}" class="nav-link {{ 'active' if active_page == 'whois' else '' }}">👤 WHOIS</a>
+            <a href="{{ url_for('email_page') }}" class="nav-link {{ 'active' if active_page == 'email' else '' }}">📧 Email</a>
             <a href="{{ url_for('connection_page') }}" class="nav-link {{ 'active' if active_page == 'connection' else '' }}">🚀 Conexão</a>
         </nav>
         
@@ -31,7 +32,7 @@
             {% block content %}{% endblock %}
         </main>
         <footer>
-            <p>Um projeto de segurança para análise de Sites suspeitos. &copy; {{ current_year }} by Lúcio Macedo</p>
+            <p>Um projeto de segurança para análise de Sites e E-mails suspeitos. &copy; {{ current_year }}</p>
         </footer>
     </div>
     <script>

@@ -81,6 +81,80 @@
             </div>
             {% endif %}
 
+            <!-- Seção Email -->
+            {% if email_result %}
+            <div class="card report-email">
+                <h2>Relatório de E-mail 📧</h2>
+                {% if email_result.erro %}
+                    <p class="error">❌ {{ email_result.erro }}</p>
+                {% else %}
+                    
+                    <!-- 1. Base de Spam (StopForumSpam) -->
+                    <div class="sub-report">
+                        <h3>Base de Spam (StopForumSpam)</h3>
+                        {% set spam = email_result.spam_db %}
+                        {% if spam.erro %}
+                            <p class="error">❌ {{ spam.erro }}</p>
+                        {% elif spam.status == 'Detectado' %}
+                            <p><strong>Status:</strong> <span class="malicious">LISTADO COMO SPAM</span></p>
+                            <p><strong>Frequência:</strong> {{ spam.frequencia }}</p>
+                            <p><strong>Última vez visto:</strong> {{ spam.ultima_vez }}</p>
+                            <p><strong>Confiança:</strong> {{ spam.confianca }}%</p>
+                        {% else %}
+                            <p><strong>Status:</strong> <span class="safe">LIMPO</span></p>
+                            <p>{{ spam.mensagem }}</p>
+                        {% endif %}
+                    </div>
+
+                    <hr style="margin: 15px 0; border: 0; border-top: 1px solid #eee;">
+
+                    <!-- 2. Segurança do Domínio (Google Safe Browsing) -->
+                    <div class="sub-report">
+                        <h3>Segurança do Domínio (Google Safe Browsing)</h3>
+                        {% set domain_sec = email_result.domain_security %}
+                        {% if domain_sec.erro %}
+                            <p class="error">❌ {{ domain_sec.erro }}</p>
+                        {% elif domain_sec.status == 'Perigoso' %}
+                            <p><strong>Status:</strong> <span class="malicious">DOMÍNIO PERIGOSO</span></p>
+                            <p><strong>Ameaça:</strong> {{ domain_sec.ameaça }}</p>
+                        {% else %}
+                            <p><strong>Status:</strong> <span class="safe">DOMÍNIO SEGURO</span></p>
+                            <p>Nenhuma ameaça encontrada no domínio do e-mail.</p>
+                        {% endif %}
+                    </div>
+
+                    <hr style="margin: 15px 0; border: 0; border-top: 1px solid #eee;">
+
+                    <!-- 3. Registros MX (Capacidade de Recebimento) -->
+                    <div class="sub-report">
+                        <h3>Capacidade de Recebimento (MX)</h3>
+                        {% set mx = email_result.mx_records %}
+                        {% if mx.status == 'Válido' %}
+                            <p><strong>Status:</strong> <span class="safe">VÁLIDO</span></p>
+                            <p>Servidores de e-mail encontrados:</p>
+                            <ul style="font-size: 0.9em; color: #555;">
+                                {% for reg in mx.registros %}
+                                    <li>{{ reg }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <p><strong>Status:</strong> <span class="malicious">INVÁLIDO</span></p>
+                            <p class="error">{{ mx.erro }}</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Resumo Final -->
+                    <div class="summary" style="margin-top: 15px;">
+                        {% if (email_result.spam_db.status == 'Detectado') or (email_result.domain_security.status == 'Perigoso') or (email_result.mx_records.status != 'Válido') %}
+                            <strong>Resultado Final:</strong> <span class="malicious">PERIGOSO</span>
+                        {% else %}
+                            <strong>Resultado Final:</strong> <span class="safe">SEGURO</span>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            </div>
+            {% endif %}
+
             <!-- Seção DNS -->
             {% if dns_result %}
             <div class="card report-dns">

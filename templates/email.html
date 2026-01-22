@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block title %}Verificação de E-mail{% endblock %}
+
+{% block header %}
+    <h1>Verificação de E-mail 📧</h1>
+    <p>Verifique se um endereço de e-mail está listado em bases de dados de spam (StopForumSpam).</p>
+{% endblock %}
+
+{% block content %}
+    <style>
+        /* Estilos para garantir que o input de e-mail tenha a mesma aparência dos inputs de texto */
+        input[type="email"] {
+            width: 100%;
+            padding: 12px 20px;
+            margin: 8px 0;
+            display: inline-block;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        input[type="email"]:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+
+        /* Ajustes para o Modo Escuro */
+        [data-theme="dark"] input[type="email"] {
+            background-color: #2b2b2b;
+            color: #fff;
+            border-color: #555;
+        }
+
+        /* Estilos de validação visual */
+        input[type="email"].valid {
+            border-color: #28a745 !important;
+            box-shadow: 0 0 5px rgba(40, 167, 69, 0.5);
+        }
+        input[type="email"].invalid {
+            border-color: #dc3545 !important;
+            box-shadow: 0 0 5px rgba(220, 53, 69, 0.5);
+        }
+    </style>
+
+    <form action="{{ url_for('check_email') }}" method="POST" id="emailForm">
+        <input type="email" name="email" id="emailInput" placeholder="exemplo@spam.com" required>
+        <button type="submit">Verificar E-mail</button>
+    </form>
+    <a href="{{ url_for('index') }}" class="back-link">Voltar para Home</a>
+
+    <script>
+        // Validação em tempo real
+        const emailInput = document.getElementById('emailInput');
+        
+        emailInput.addEventListener('input', function() {
+            const email = this.value.trim();
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            
+            if (email === "") {
+                this.classList.remove('valid', 'invalid');
+            } else if (emailRegex.test(email)) {
+                this.classList.add('valid');
+                this.classList.remove('invalid');
+            } else {
+                this.classList.add('invalid');
+                this.classList.remove('valid');
+            }
+        });
+
+        document.getElementById('emailForm').addEventListener('submit', function(event) {
+            const email = emailInput.value.trim();
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+            if (!emailRegex.test(email)) {
+                event.preventDefault();
+                event.stopImmediatePropagation(); // Impede que o script global exiba o loading
+                alert('Por favor, insira um endereço de e-mail válido.');
+                emailInput.focus();
+            } else {
+                // Adiciona um timeout de segurança no frontend (15s)
+                setTimeout(function() {
+                    const overlay = document.getElementById('loading-overlay');
+                    // Se o overlay ainda estiver visível, remove e avisa o usuário
+                    if (overlay && overlay.style.display === 'flex') {
+                        overlay.style.display = 'none';
+                        alert('A verificação excedeu o tempo limite. O servidor de spam pode estar indisponível.');
+                    }
+                }, 15000);
+            }
+        });
+    </script>
+{% endblock %}
